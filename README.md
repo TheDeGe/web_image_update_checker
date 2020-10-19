@@ -1,7 +1,7 @@
 # web_image_update_checker
 This script checks web pages with images for updates by finding a specified image name in the source code of the web page.
 
-For this script to work one needs to provide web page URL and image URL or image name, after doing so script will find this image on the web page and will save the index this image in the text file, and in the future will check if the same image is still present by the same index on the same page.
+For this script to work one needs to provide web page URL and image URL or image name, after doing so script will find this image on the web page and will save the index of this image in the text file, and in the future will check if the same image is still present by the same index on the same page.
 
 Script have a number of available commands that can also be called by typing only the first letter of the command:  
 (c)heck  - checks web pages for image changes  
