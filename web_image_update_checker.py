@@ -120,7 +120,7 @@ def main():
     elif len(command) == 3 and command[0] in ('add', 'a'):
         _, new_page_url, new_image_url = command
         
-        if (new_page_url[:8] == 'https://' or new_page_url[:7] == 'http://') and (new_image_url[:8] == 'https://' or new_image_url[:7] == 'http://'):
+        if new_page_url[:8] == 'https://' or new_page_url[:7] == 'http://':
             entries = create_or_read_file(file_path)
             new_image_name = new_image_url.split('/')[-1]
             new_image_index = find_image_index(new_page_url, new_image_name)
@@ -136,7 +136,7 @@ def main():
     elif len(command) == 2 and command[0] in ('delete', 'd'):
         _, deleted_page_url = command
         
-        if (deleted_page_url[:8] == 'https://' or deleted_page_url[:7] == 'http://'):
+        if deleted_page_url[:8] == 'https://' or deleted_page_url[:7] == 'http://':
             entries = create_or_read_file(file_path)
             find_and_change_entry(deleted_page_url, '', entries, file_path, 'Entry deleted', 'Entry not found')
         else:
