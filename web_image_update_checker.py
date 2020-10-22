@@ -182,10 +182,10 @@ def main():
     elif len(command) == 1 and command[0] in ('help', 'h'):
         print('All commands:',
             '\n(c)heck  - checks web pages for image changes',
-            '\n(u)pdate - updates changed images in the text file',
+            '\n(u)pdate - updates all or specified by id, changed images in the text file',
             '\n(a)dd    - changes existing entry or adds a new entry, type like this:  add page_url image_url',
             '\n(d)elete - deletes existing entry, type like this:  delete page_url',
-            '\n(l)ist   - lists all entries like this:  page_url image_name image_index',
+            '\n(l)ist   - lists all entries like this:  id page_url image_name image_index',
             '\n(e)xit   - stops the program',
             '\n(h)elp   - shows all commands')
     
