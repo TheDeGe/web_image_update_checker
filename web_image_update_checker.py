@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import webbrowser
 import requests
 import os
 
@@ -125,6 +126,7 @@ def main():
         entries = create_or_read_file(file_path)
         print('Updated web pages:')
         
+        updated_pages = {}
         for entry in entries:
             index, page_url, image_name, image_index = entry.split()
             new_image_name = find_image_name(page_url, image_index)
@@ -132,7 +134,24 @@ def main():
             if new_image_name == '':
                 continue
             elif new_image_name != image_name:
+                updated_pages.update({index:page_url})
                 print(f'{index}  {page_url}')
+
+        command = input("\nType id's of web pages or type (a)ll> ").split()
+        
+        if len(command) > 0 and command[0] in ('all', 'a'):
+            
+            for index in updated_pages.keys():
+                webbrowser.open_new_tab(updated_pages[index])
+
+        elif len(command) > 0:
+
+            for index in command:
+
+                if index in updated_pages.keys():
+                    webbrowser.open_new_tab(updated_pages[index])
+                    
+        else: print('Wrong syntax')
                 
     elif len(command) > 1 and command[0] in ('update', 'u'):
         updated_indices = command[1:]
@@ -181,7 +200,7 @@ def main():
     
     elif len(command) == 1 and command[0] in ('help', 'h'):
         print('All commands:',
-            '\n(c)heck  - checks web pages for image changes',
+            '\n(c)heck  - checks web pages for image changes and allows to open changed pages in web browser',
             '\n(u)pdate - updates all or specified by id, changed images in the text file',
             '\n(a)dd    - changes existing entry or adds a new entry, type like this:  add page_url image_url',
             '\n(d)elete - deletes existing entry, type like this:  delete page_url',
