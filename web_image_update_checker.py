@@ -52,14 +52,46 @@ def find_image_index(page_url, image_name):
         return -1
 
 
-def find_and_change_entry(searched_page_url, new_entry, entries, file_path, found_message, not_found_message):
+def update_entries(updated_indices, file_path):
+    entries = create_or_read_file(file_path)
+
+    if updated_indices != '':
+        updated_indices = list(map(int, updated_indices))
+    else:
+        updated_indices = range(1, len(entries)+1)
+
+    for i, entry in enumerate(entries):
+        
+        if i+1 in updated_indices:
+            _, page_url, image_name, image_index = entry.split()
+            new_image_name = find_image_name(page_url, image_index)
+            
+            if new_image_name == '':
+                continue
+            elif new_image_name != image_name:
+                entries[i] = '  '.join((str(i+1), page_url, new_image_name, image_index)) + '\n'
+                print(entries[i], end='')
+            
+    with open(file_path, 'w') as f:
+        f.writelines(entries)
+
+
+def find_and_change_entry(searched_page_url, new_entry_text, entries, file_path, found_message, not_found_message):
     entry_found = False
     
     for i, entry in enumerate(entries):
-        page_url = entry.split()[0]
+        page_url = entry.split()[1]
 
         if page_url == searched_page_url:
-            entries[i] = new_entry
+
+            if new_entry_text != '':
+                entries[i] = '  '.join((str(i+1), new_entry_text))
+            else:
+                del entries[i]
+                
+                for j, entry in enumerate(entries):
+                    _, page_url, image_name, image_index = entry.split()
+                    entries[j] = '  '.join((str(j+1), page_url, image_name, image_index)) + '\n'
 
             with open(file_path, 'w') as f:
                 f.writelines(entries)
@@ -70,7 +102,9 @@ def find_and_change_entry(searched_page_url, new_entry, entries, file_path, foun
 
     if not entry_found:
         
-        if len(new_entry) > 0:
+        if new_entry_text != '':
+            index = str(len(entries)+1)
+            new_entry = '  '.join((index, new_entry_text)) + '\n'
 
             with open(file_path, 'a') as f:
                 f.writelines(new_entry)
@@ -79,12 +113,12 @@ def find_and_change_entry(searched_page_url, new_entry, entries, file_path, foun
 
 
 def main():
-    command = input('\nType your command, type "help" for help> ').lower().split(maxsplit=3)
+    command = input('\nType your command, type "help" for help> ').split()
     
     if '__file__' in globals():
         basepath = os.path.dirname(os.path.realpath(__file__))
     else: basepath = os.getcwd()
-            
+    
     file_path = os.path.join(basepath, 'web_pages_and_images.txt')
     
     if len(command) == 1 and command[0] in ('check', 'c'):
@@ -92,30 +126,22 @@ def main():
         print('Updated web pages:')
         
         for entry in entries:
-            page_url, image_name, image_index = entry.split()
+            index, page_url, image_name, image_index = entry.split()
             new_image_name = find_image_name(page_url, image_index)
             
             if new_image_name == '':
                 continue
             elif new_image_name != image_name:
-                print(page_url)
+                print(f'{index}  {page_url}')
                 
-    elif len(command) == 1 and command[0] in ('update', 'u'):
-        entries = create_or_read_file(file_path)
+    elif len(command) > 1 and command[0] in ('update', 'u'):
+        updated_indices = command[1:]
         print('Updated entries:')
-        
-        for i, entry in enumerate(entries):
-            page_url, image_name, image_index = entry.split()
-            new_image_name = find_image_name(page_url, image_index)
-            
-            if new_image_name == '':
-                continue
-            elif new_image_name != image_name:
-                entries[i] = '  '.join([page_url, new_image_name, image_index]) + '\n'
-                print(entries[i], end='')
-                
-        with open(file_path, 'w') as f:
-            f.writelines(entries)
+        update_entries(updated_indices, file_path)
+
+    elif len(command) == 1 and command[0] in ('update', 'u'):
+        print('Updated entries:')
+        update_entries('', file_path)
 
     elif len(command) == 3 and command[0] in ('add', 'a'):
         _, new_page_url, new_image_url = command
@@ -128,8 +154,8 @@ def main():
             if new_image_index == -1:
                 pass
             else:
-                new_entry = '  '.join([new_page_url, new_image_name, str(new_image_index)]) + '\n'
-                find_and_change_entry(new_page_url, new_entry, entries, file_path, 'Entry changed', 'Entry added')
+                new_entry_text = '  '.join((new_page_url, new_image_name, str(new_image_index))) + '\n'
+                find_and_change_entry(new_page_url, new_entry_text, entries, file_path, 'Entry changed', 'Entry added')
         else:
             print('Links must contain "https://" or "http://" part at the beginning')
     
@@ -155,13 +181,13 @@ def main():
     
     elif len(command) == 1 and command[0] in ('help', 'h'):
         print('All commands:',
-              '\n(c)heck  - checks web pages for image changes',
-              '\n(u)pdate - updates changed images in the text file',
-              '\n(a)dd    - changes existing entry or adds a new entry, type like this:  add page_url image_url',
-              '\n(d)elete - deletes existing entry, type like this:  delete page_url',
-              '\n(l)ist   - lists all entries like this:  page_url image_name image_index',
-              '\n(e)xit   - stops the program',
-              '\n(h)elp   - shows all commands')
+            '\n(c)heck  - checks web pages for image changes',
+            '\n(u)pdate - updates changed images in the text file',
+            '\n(a)dd    - changes existing entry or adds a new entry, type like this:  add page_url image_url',
+            '\n(d)elete - deletes existing entry, type like this:  delete page_url',
+            '\n(l)ist   - lists all entries like this:  page_url image_name image_index',
+            '\n(e)xit   - stops the program',
+            '\n(h)elp   - shows all commands')
     
     else: print('Wrong syntax')
         
