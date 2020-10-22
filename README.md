@@ -5,10 +5,10 @@ For this script to work one needs to provide web page URL and image URL or image
 
 Script have a number of available commands that can also be called by typing only the first letter of the command:  
 (c)heck  - checks web pages for image changes  
-(u)pdate - updates changed images in the text file  
+(u)pdate - updates all or specified by id, changed images in the text file  
 (a)dd    - changes existing entry or adds a new entry, type like this:  add page_url image_url  
 (d)elete - deletes existing entry, type like this:  delete page_url  
-(l)ist   - lists all entries like this:  page_url image_name image_index  
+(l)ist   - lists all entries like this:  id page_url image_name image_index  
 (e)xit   - stops the program  
 (h)elp   - shows all commands  
 
