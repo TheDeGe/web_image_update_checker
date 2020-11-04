@@ -86,13 +86,15 @@ def find_and_change_entry(searched_page_url, new_entry_text, entries, file_path,
         if page_url == searched_page_url:
 
             if new_entry_text != '':
-                entries[i] = '  '.join((str(i+1), new_entry_text))
+                entries[i] = '  '.join((str(i+1), new_entry_text)) + '\n'
             else:
                 del entries[i]
                 
                 for j, entry in enumerate(entries):
-                    _, page_url, image_name, image_index = entry.split()
-                    entries[j] = '  '.join((str(j+1), page_url, image_name, image_index)) + '\n'
+                    
+                    if j >= i:
+                        _, page_url, image_name, image_index = entry.split()
+                        entries[j] = '  '.join((str(j+1), page_url, image_name, image_index)) + '\n'
 
             with open(file_path, 'w') as f:
                 f.writelines(entries)
@@ -136,22 +138,23 @@ def main():
             elif new_image_name != image_name:
                 updated_pages.update({index:page_url})
                 print(f'{index}  {page_url}')
-
-        command = input("\nType id's of web pages or type (a)ll> ").split()
+                
+        if updated_pages:
+            command = input("\nType id's of web pages or type (a)ll> ").split()
         
-        if len(command) > 0 and command[0] in ('all', 'a'):
-            
-            for index in updated_pages.keys():
-                webbrowser.open_new_tab(updated_pages[index])
-
-        elif len(command) > 0:
-
-            for index in command:
-
-                if index in updated_pages.keys():
+            if len(command) > 0 and command[0] in ('all', 'a'):
+                
+                for index in updated_pages.keys():
                     webbrowser.open_new_tab(updated_pages[index])
-                    
-        else: print('Wrong syntax')
+
+            elif len(command) > 0:
+
+                for index in command:
+
+                    if index in updated_pages.keys():
+                        webbrowser.open_new_tab(updated_pages[index])
+                        
+            else: print('Wrong syntax')
                 
     elif len(command) > 1 and command[0] in ('update', 'u'):
         updated_indices = command[1:]
@@ -170,10 +173,8 @@ def main():
             new_image_name = new_image_url.split('/')[-1]
             new_image_index = find_image_index(new_page_url, new_image_name)
             
-            if new_image_index == -1:
-                pass
-            else:
-                new_entry_text = '  '.join((new_page_url, new_image_name, str(new_image_index))) + '\n'
+            if new_image_index != -1:
+                new_entry_text = '  '.join((new_page_url, new_image_name, str(new_image_index)))
                 find_and_change_entry(new_page_url, new_entry_text, entries, file_path, 'Entry changed', 'Entry added')
         else:
             print('Links must contain "https://" or "http://" part at the beginning')
